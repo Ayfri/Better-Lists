@@ -33,7 +33,9 @@
 		"url": "git+https://github.com/Ayfri/Better-Lists.git"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"build": "tsc",
+		"prepublishOnly": "npm run prettier && npm run build",
+		"prettier": "prettier *.ts *.json *.md --write"
 	},
 	"version": "0.1.0"
 }
