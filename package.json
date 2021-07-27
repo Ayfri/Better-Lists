@@ -1,0 +1,26 @@
+{
+  "author": "Ayfri",
+  "bugs": {
+    "url": "https://github.com/Ayfri/Better-Lists/issues"
+  },
+  "description": "A package for using better lists.",
+  "homepage": "https://github.com/Ayfri/Better-Lists#readme",
+  "keywords": [
+    "list",
+    "lists",
+    "array",
+    "collection",
+    "kotlin"
+  ],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "better-list",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ayfri/Better-Lists.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.1.0"
+}
