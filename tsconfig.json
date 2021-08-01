@@ -2,10 +2,10 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"strict": true,
-    "declaration": true,
-    "noImplicitOverride": true,
-    "rootDir": "src",
-    "noImplicitAny": true,
+		"declaration": true,
+		"noImplicitOverride": true,
+		"rootDir": "src",
+		"noImplicitAny": true,
 		"target": "ESNext"
 	}
 }
