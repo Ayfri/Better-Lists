@@ -19,6 +19,7 @@ export type IndexedAccumulator<S, T> = (index: number, acc: S, value: T) => S;
 export type Comparator<T> = (first: T, second: T) => number;
 
 export type Class<T = any, A = any> = {new (...args: A[]): T};
+export type Nil = null | undefined;
 
 export interface JoinToOptions<T> {
 	limit?: number;
@@ -27,6 +28,18 @@ export interface JoinToOptions<T> {
 	separator?: string;
 	transform?: Transform<T, string>;
 	truncated?: string;
+}
+
+export function emptyList<T>(): List<T> {
+	return new List<T>();
+}
+
+export function listOf<T>(...elements: T[]): List<T> {
+	return List.of(...elements);
+}
+
+export function listOfNotNull<T extends any>(...elements: Array<T | Nil>): List<NonNullable<T>> {
+	return List.of(...elements).filterNotNull();
 }
 
 export class List<T> extends Array<T> {
@@ -91,8 +104,8 @@ export class List<T> extends Array<T> {
 	}
 
 	public binarySearch(fromIndex: number, toIndex: number, comparison: Selector<T, number>): number;
-	public binarySearch(element: T | null, comparator: Comparator<T | null>, fromIndex: number, toIndex: number): number;
-	public binarySearch(element: T | null | number, comparator: Comparator<T | null> | number, fromIndex: number | Selector<T, number>, toIndex = this.length) {
+	public binarySearch(element: T | Nil, comparator: Comparator<T | Nil>, fromIndex: number, toIndex: number): number;
+	public binarySearch(element: T | Nil | number, comparator: Comparator<T | Nil> | number, fromIndex: number | Selector<T, number>, toIndex = this.length) {
 		if (typeof element === 'number') {
 			const comparison = fromIndex as Selector<T, number>;
 			toIndex = comparator as number;
@@ -115,7 +128,7 @@ export class List<T> extends Array<T> {
 
 			return -(low + 1);
 		} else {
-			comparator = comparator as Comparator<T | null>;
+			comparator = comparator as Comparator<T | Nil>;
 			fromIndex = fromIndex as number;
 
 			const check = this.rangeCheck(this.length, fromIndex, toIndex);
@@ -138,17 +151,17 @@ export class List<T> extends Array<T> {
 		}
 	}
 
-	public binarySearchBy<K extends string | number>(key: K | null, fromIndex = 0, toIndex = this.length, selector: Selector<T, K | null>): number | undefined {
+	public binarySearchBy<K extends string | number>(key: K | Nil, fromIndex = 0, toIndex = this.length, selector: Selector<T, K | Nil>): number | undefined {
 		if (!this.isComparable()) return undefined;
 
 		return this.binarySearch(fromIndex, toIndex, value => {
 			const result = selector(value);
-			if ((result as any) == (value as any)) return 0;
-			if (value === null) return 1;
-			if (result === null) return -1;
+			if ((result as any) == (key as any)) return 0;
+			if (!isNil(key)) return 1;
+			if (!isNil(result)) return -1;
 
-			if (typeof result === 'number' && typeof value === 'number') return result > value ? 1 : result < value ? -1 : 0;
-			else if (typeof result === 'string' && typeof value === 'string') return (result as unknown as string).localeCompare(value);
+			if (typeof result === 'number' && typeof key === 'number') return result > key ? 1 : result < key ? -1 : 0;
+			else if (typeof result === 'string' && typeof key === 'string') return (result as unknown as string).localeCompare(key);
 			else return 0;
 		});
 	}
@@ -322,12 +335,12 @@ export class List<T> extends Array<T> {
 		return this.filterNotTo(new List<T>(), predicate);
 	}
 
-	public filterNotNull() {
-		return this.filterNotNullTo(new List<T>());
+	public filterNotNull(): List<NonNullable<T>> {
+		return this.filterNotNullTo(new List<NonNullable<T>>());
 	}
 
-	public filterNotNullTo(destination: List<T>) {
-		destination = this.filter(e => e !== null);
+	public filterNotNullTo(destination: List<NonNullable<T>>): List<NonNullable<T>> {
+		destination = this.filter(e => !isNil(e)) as List<NonNullable<T>>;
 		return destination;
 	}
 
@@ -375,16 +388,16 @@ export class List<T> extends Array<T> {
 		return predicate ? this.find(predicate) : this[0];
 	}
 
-	public firstNotNullOf<R>(transform: Transform<T, R | null>): R {
+	public firstNotNullOf<R>(transform: Transform<T, R | Nil>): NonNullable<R> {
 		const result = this.firstNotNullOfOrNull(transform);
-		if (result === null) throw new Error('No element of the collection was transformed to a non-null value.');
-		return result;
+		if (isNil(result)) throw new Error('No element of the collection was transformed to a non-null value.');
+		return result as NonNullable<R>;
 	}
 
-	public firstNotNullOfOrNull<R>(transform: Transform<T, R | null>): R | null {
+	public firstNotNullOfOrNull<R>(transform: Transform<T, R | Nil>): R | null {
 		for (const element of this) {
 			const result = transform(element);
-			if (result !== null) return result;
+			if (!isNil(result)) return result;
 		}
 
 		return null;
@@ -502,7 +515,7 @@ export class List<T> extends Array<T> {
 	}
 
 	public get indices() {
-		return List.from({length: 10}, (_, i) => i + 1);
+		return List.of(...Array(this.length).keys());
 	}
 
 	public intersect(other: T[]) {
@@ -598,11 +611,11 @@ export class List<T> extends Array<T> {
 		return this.mapIndexedTo(new List<R>(), transform);
 	}
 
-	public mapIndexedNotNull<R>(transform: IndexedTransform<T, R | null>) {
-		return this.mapIndexedNotNullTo(new List<R>(), transform);
+	public mapIndexedNotNull<R>(transform: IndexedTransform<T, R | Nil>): List<NonNullable<R>> {
+		return this.mapIndexedNotNullTo(new List<NonNullable<R>>(), transform);
 	}
 
-	public mapIndexedNotNullTo<R>(destination: List<R>, transform: IndexedTransform<T, R | null>) {
+	public mapIndexedNotNullTo<R>(destination: List<NonNullable<R>>, transform: IndexedTransform<T, R | Nil>): List<NonNullable<R>> {
 		this.filterNotNull().mapIndexedTo(destination, transform);
 		return destination;
 	}
@@ -613,12 +626,12 @@ export class List<T> extends Array<T> {
 		return destination;
 	}
 
-	public mapNotNull<R>(transform: MapTransform<T, R>): List<R> {
-		return this.mapNotNullTo(new List<R>(), transform);
+	public mapNotNull<R>(transform: MapTransform<T, R>): List<NonNullable<R>> {
+		return this.mapNotNullTo(new List<NonNullable<R>>(), transform);
 	}
 
-	public mapNotNullTo<R>(destination: List<R>, transform: MapTransform<T, R>): List<R> {
-		return this.filterNotNull().mapTo(destination, transform);
+	public mapNotNullTo<R>(destination: List<NonNullable<R>>, transform: MapTransform<T, R | Nil>): List<NonNullable<R>> {
+		return this.filterNotNull().mapTo(destination, transform).filterNotNull();
 	}
 
 	public mapTo<R>(destination: List<R>, transform: MapTransform<T, R>) {
@@ -1312,4 +1325,8 @@ export class List<T> extends Array<T> {
 		else if (fromIndex < 0) return `fromIndex (${fromIndex}) is less than zero.`;
 		else if (toIndex > size) return `toIndex (${toIndex}) is greater than size (${size}).`;
 	}
+}
+
+function isNil(value: any): value is null | undefined {
+	return value === null || value === undefined;
 }
