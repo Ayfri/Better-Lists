@@ -292,9 +292,9 @@ export class List<T> extends Array<T> {
 			const b = other[i];
 
 			if (Array.isArray(a) && Array.isArray(b)) {
-				if (!(new List(a).equals(b))) return false;
+				if (!new List(a).equals(b)) return false;
 			} else if (typeof a === 'object' && typeof b === 'object') {
-				if (!(new List(Object.entries(a)).equals(Object.entries(b)))) return false;
+				if (!new List(Object.entries(a)).equals(Object.entries(b))) return false;
 			} else if (a !== b) {
 				return false;
 			}
@@ -600,7 +600,7 @@ export class List<T> extends Array<T> {
 	}
 
 	public *listIterator(index = 0) {
-		yield* this.copy().sort().slice(index)
+		yield* this.copy().sort().slice(index);
 	}
 
 	public override map<R>(transform: MapTransform<T, R>, thisArg?: any) {

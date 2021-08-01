@@ -7,6 +7,7 @@ A package for using better lists.
 ## Installation
 
 To install it, simply run this command :
+
 ```bash
 npm run better-list
 ```
