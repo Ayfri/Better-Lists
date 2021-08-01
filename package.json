@@ -18,7 +18,7 @@
 		"kotlin"
 	],
 	"license": "ISC",
-	"main": "index.js",
+	"main": "dist",
 	"name": "better-list",
 	"prettier": {
 		"arrowParens": "avoid",
@@ -37,5 +37,6 @@
 		"prepublishOnly": "npm run prettier && npm run build",
 		"prettier": "prettier **.ts **.json **.md --write"
 	},
+	"types": "dist",
 	"version": "0.1.0"
 }
