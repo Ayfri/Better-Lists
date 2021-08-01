@@ -9,7 +9,7 @@ A package for using better lists.
 To install it, simply run this command :
 
 ```bash
-npm run better-list
+npm install better-list --save
 ```
 
 ## What it contains
