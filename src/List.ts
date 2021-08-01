@@ -23,8 +23,8 @@ export type Nil = null | undefined;
 
 export interface JoinToOptions<T> {
 	limit?: number;
-	prefix?: string;
 	postfix?: string;
+	prefix?: string;
 	separator?: string;
 	transform?: Transform<T, string>;
 	truncated?: string;
@@ -1120,17 +1120,20 @@ export class List<T> extends Array<T> {
 		return Array.from(this);
 	}
 
-	public toMap<R extends [any, any]>(): Map<R[0], R[1]> {
-		const values = this.all(e => e instanceof Array && e.length === 2) ? (this as unknown as List<R>) : Object.entries(this);
-		return new Map<R[0], R[1]>(values);
+	public toBigInt64Array() {
+		return BigInt64Array.from(this as unknown as List<bigint>);
 	}
 
-	public toSet() {
-		return new Set<T>(this);
+	public toBigUint64Array() {
+		return BigUint64Array.from(this as unknown as List<bigint>);
 	}
 
-	public toSortedSet(comparator: Comparator<T>) {
-		return this.sortedWith(comparator).toSet();
+	public toFloat32Array() {
+		return Float32Array.from(this as unknown as List<number>);
+	}
+
+	public toFloat64Array() {
+		return Float64Array.from(this as unknown as List<number>);
 	}
 
 	public toInt8Array() {
@@ -1149,8 +1152,17 @@ export class List<T> extends Array<T> {
 		yield* this;
 	}
 
-	public toBigInt64Array() {
-		return BigInt64Array.from(this as unknown as List<bigint>);
+	public toMap<R extends [any, any]>(): Map<R[0], R[1]> {
+		const values = this.all(e => e instanceof Array && e.length === 2) ? (this as unknown as List<R>) : Object.entries(this);
+		return new Map<R[0], R[1]>(values);
+	}
+
+	public toSet() {
+		return new Set<T>(this);
+	}
+
+	public toSortedSet(comparator: Comparator<T>) {
+		return this.sortedWith(comparator).toSet();
 	}
 
 	public toUint8Array() {
@@ -1167,18 +1179,6 @@ export class List<T> extends Array<T> {
 
 	public toUint32Array() {
 		return Uint32Array.from(this as unknown as List<number>);
-	}
-
-	public toBigUint64Array() {
-		return BigUint64Array.from(this as unknown as List<bigint>);
-	}
-
-	public toFloat32Array() {
-		return Float32Array.from(this as unknown as List<number>);
-	}
-
-	public toFloat64Array() {
-		return Float64Array.from(this as unknown as List<number>);
 	}
 
 	public union() {
