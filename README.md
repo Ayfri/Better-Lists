@@ -1,7 +1,7 @@
 # Better-List
 
-[![npm bundle size](https://img.shields.io/bundlephobia/min/better-list)](https://www.npmjs.com/package/better-list)
-[![npm install](https://nodei.co/npm/better-list.png?downloads=true&stars=true)](https://www.npmjs.com/package/better-list)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/better-list)](https://www.npmjs.com/package/better-list)<br>
+[![npm install](https://nodei.co/npm/better-list.png?downloads=true&stars=true)](https://www.npmjs.com/package/better-list)<br>
 A package for using better lists.
 
 ## Installation
